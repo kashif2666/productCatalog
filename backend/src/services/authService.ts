@@ -8,11 +8,30 @@ dotenv.config();
 
 export const signup = async (name: string, email: string, password: string) => {
   const hashedPassword = await bcrypt.hash(password, 10);
-  await pool.query(`INSERT INTO users (name,email,password) VALUES (?,?,?)`, [
-    name,
-    email,
-    hashedPassword,
-  ]);
+
+  await pool.query(
+    "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+    [name, email, hashedPassword]
+  );
+
+  // Fetch newly created user
+  const [rows] = await pool.query<RowDataPacket[]>(
+    "SELECT * FROM users WHERE email = ?",
+    [email]
+  );
+
+  if (rows.length === 0) return null;
+
+  const user = rows[0];
+
+  // Generate token
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET as string,
+    { expiresIn: "1h" }
+  );
+
+  return { token, user };
 };
 
 export const login = async (email: string, password: string) => {
