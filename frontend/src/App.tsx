@@ -1,8 +1,14 @@
+import { Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import ProductPage from "./pages/ProductPage";
 function App() {
   return (
-    <>
-      <h2 className="text-3xl">Hello Vite </h2>
-    </>
+    <div className="min-h-screen bg-base-200 transition-colors duration-300">
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/product/:id" element={<ProductPage />} />
+      </Routes>
+    </div>
   );
 }
 
