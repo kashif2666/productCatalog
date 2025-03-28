@@ -5,8 +5,9 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const signup = async (req: Request, res: Response): Promise<void> => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
+  const { username, email, password } = req.body;
+
+  if (!username || !email || !password) {
     res
       .status(400)
       .json({ success: false, message: "All fields are required" });
@@ -14,7 +15,8 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    const result = await authService.signup(name, email, password);
+    const result = await authService.signup(username, email, password);
+    console.log(result);
     if (!result) {
       res.status(401).json({ success: false, message: "Signup failed" });
       return;
@@ -48,11 +50,12 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
   try {
     const result = await authService.login(email, password);
+    console.log(result);
     if (!result) {
       res
         .status(401)
         .json({ status: 401, success: false, message: "Invalid Credentials" });
-        return;
+      return;
     }
 
     res.cookie("token", result?.token, {

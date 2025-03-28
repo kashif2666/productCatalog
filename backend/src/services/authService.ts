@@ -6,12 +6,16 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export const signup = async (name: string, email: string, password: string) => {
+export const signup = async (
+  username: string,
+  email: string,
+  password: string
+) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   await pool.query(
-    "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-    [name, email, hashedPassword]
+    "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+    [username, email, hashedPassword]
   );
 
   // Fetch newly created user
