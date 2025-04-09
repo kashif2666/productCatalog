@@ -25,8 +25,8 @@ export const signup = async (req: Request, res: Response): Promise<void> => {
     // Set cookie
     res.cookie("token", result?.token, {
       httpOnly: true,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
+      secure: false,
       maxAge: 3600000, // 1 hour
     });
 
@@ -61,8 +61,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.cookie("token", result?.token, {
       httpOnly: true,
       maxAge: 3600000,
-      sameSite: "strict",
-      secure: process.env.NODE_ENV !== "development",
+      sameSite: "lax",
+      secure: false,
     });
 
     res.status(200).json({ status: 200, success: true, user: result?.user });

@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import ProductCard from "../components/ProductCard";
 import { useProductStore } from "../store/useProductStore";
 import AddProductModal from "../components/AddProductModal";
+import { useAuthStore } from "../store/useAuthStore";
 
 const HomePage = () => {
   const { products, loading, error, fetchProducts } = useProductStore();
+  const { logout } = useAuthStore();
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
@@ -23,6 +25,10 @@ const HomePage = () => {
       <div className="flex justify-between items-center mb-8">
         <button className="btn btn-primary" onClick={openAddProductModal}>
           Add Product
+        </button>
+
+        <button className="btn btn-error" onClick={logout}>
+          Logout
         </button>
       </div>
 

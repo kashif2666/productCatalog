@@ -8,7 +8,7 @@ const LoginPage = () => {
 
   const { login } = useAuthStore();
 
-  const handleSignin = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     login({ email, password });
   };
@@ -20,7 +20,7 @@ const LoginPage = () => {
             Login
           </h1>
 
-          <form className="space-y-4" onSubmit={handleSignin}>
+          <form className="space-y-4" onSubmit={handleLogin}>
             <div>
               <label
                 htmlFor="email"

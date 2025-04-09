@@ -27,7 +27,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
   signin: async (credentials) => {
     set({ isSigningUp: true });
     try {
-      const response = await axios.post("/api/v1/auth/signup", credentials);
+      const response = await axios.post("/api/v1/auth/signup", credentials, {
+        withCredentials: true,
+      });
       set({ user: response.data.user });
     } catch (error: any) {
       console.log("Error in Signning In", error);
@@ -43,7 +45,9 @@ export const useAuthStore = create<AuthStore>((set) => ({
   login: async (credentials) => {
     set({ isLoggingIn: true });
     try {
-      const response = await axios.post("/api/v1/auth/login", credentials);
+      const response = await axios.post("/api/v1/auth/login", credentials, {
+        withCredentials: true,
+      });
       set({ user: response.data.user });
     } catch (error: any) {
       console.log("Error in Logging In", error);
@@ -69,11 +73,21 @@ export const useAuthStore = create<AuthStore>((set) => ({
   authCheck: async () => {
     set({ isCheckingAuth: true });
     try {
-      const response = await axios.get("/api/v1/auth/authCheck");
-      set({ user: response.data.user });
-    } catch (error) {
+      const response = await axios.get("/api/v1/auth/authCheck", {
+        withCredentials: true,
+      });
+      set({ user: response.data.user, error: null });
+    } catch (error: any) {
       console.log("Error in authCheck", error);
-      set({ user: null, error: "failed to check authentication" });
+      if (error.response?.status === 401) {
+        console.log("User not logged in");
+      } else {
+        console.log("Unexpected error in authCheck", error);
+      }
+      set({
+        user: null,
+        error: error.response?.data?.message || "Not authenticated",
+      });
     } finally {
       set({ isCheckingAuth: false });
     }
