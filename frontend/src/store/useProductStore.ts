@@ -26,8 +26,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   formData: {
     name: "",
     description: "",
-    price: 0.0,
-    stock: 0,
+    price: null,
+    stock: null,
     image: "",
   },
   setFormData: (formData) => set({ formData }),

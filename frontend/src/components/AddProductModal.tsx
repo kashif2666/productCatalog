@@ -4,8 +4,7 @@ import React, { ChangeEvent, useState } from "react";
 import axios from "axios";
 
 const AddProductModal = () => {
-  const { formData, setFormData, addProduct, loading, error } =
-    useProductStore();
+  const { formData, setFormData, addProduct, loading } = useProductStore();
   const [file, setFile] = useState<File | null>(null);
   file;
   const [message, setMessage] = useState<string>("");
@@ -45,6 +44,10 @@ const AddProductModal = () => {
 
       setFormData({ ...formData, image: res.data.filename });
       setMessage("Image Uploaded");
+
+      setFile(null);
+      (document.querySelector("input[type='file']") as HTMLInputElement).value =
+        "";
     } catch (error) {
       console.error(error);
       setMessage("Upload Failed");
@@ -128,7 +131,7 @@ const AddProductModal = () => {
               step="0.01"
               placeholder="$ 0.00"
               className="input input-bordered w-full my-1"
-              value={formData.price}
+              value={formData.price ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, price: Number(e.target.value) })
               }
@@ -148,7 +151,7 @@ const AddProductModal = () => {
               step="1"
               placeholder="0"
               className="input input-bordered w-full my-1"
-              value={formData.stock}
+              value={formData.stock ?? ""}
               onChange={(e) =>
                 setFormData({ ...formData, stock: Number(e.target.value) })
               }
@@ -185,6 +188,18 @@ const AddProductModal = () => {
             )}
           </div>
 
+          {/* IMAGE PREVIEW */}
+          {formData.image && (
+            <div className="mt-4">
+              <p className="text-sm font-medium mb-1">Current Image:</p>
+              <img
+                src={`/api/uploads/${formData.image}`} // adjust path if needed
+                alt="Product"
+                className="h-32 object-cover rounded border"
+              />
+            </div>
+          )}
+
           {/* FORM ACTIONS */}
           <div className="modal-action flex justify-between mt-8">
             <button
@@ -211,8 +226,14 @@ const AddProductModal = () => {
                 !formData.stock
               }
             >
-              <PlusCircleIcon className="size-4 mr-2" />
-              Add Product
+              {loading ? (
+                <span className="loading loading-spinner loading-sm" />
+              ) : (
+                <>
+                  <PlusCircleIcon className="size-5 mr-2" />
+                  Add Product
+                </>
+              )}
             </button>
           </div>
         </form>

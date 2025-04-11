@@ -1,4 +1,4 @@
-import { SaveIcon, Trash2Icon } from "lucide-react";
+import { Loader, SaveIcon, Trash2Icon } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useProductStore } from "../store/useProductStore";
 import { ChangeEvent, useEffect, useState } from "react";
@@ -10,7 +10,6 @@ const ProductPage = () => {
   const {
     formData,
     fetchProduct,
-    resetForm,
     setFormData,
     updateProduct,
     deleteProduct,
@@ -27,6 +26,22 @@ const ProductPage = () => {
       fetchProduct(Number(id));
     }
   }, [fetchProduct, id]);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader className="animate-ping text-red-600 size-10" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="alert alert-error">{error}</div>
+      </div>
+    );
+  }
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -59,6 +74,10 @@ const ProductPage = () => {
 
       setFormData({ ...formData, image: res.data.filename });
       setMessage("Image Uploaded");
+
+      setFile(null);
+      (document.querySelector("input[type='file']") as HTMLInputElement).value =
+        "";
     } catch (error) {
       console.error(error);
       setMessage("Upload Failed");
@@ -149,7 +168,7 @@ const ProductPage = () => {
                 step="0.01"
                 placeholder="$ 0.00"
                 className="input input-bordered w-full my-1"
-                value={formData.price}
+                value={formData.price ?? ""}
                 onChange={(e) =>
                   setFormData({ ...formData, price: Number(e.target.value) })
                 }
@@ -169,7 +188,7 @@ const ProductPage = () => {
                 step="1"
                 placeholder="0"
                 className="input input-bordered w-full my-1"
-                value={formData.stock}
+                value={formData.stock ?? ""}
                 onChange={(e) =>
                   setFormData({ ...formData, stock: Number(e.target.value) })
                 }
@@ -201,6 +220,9 @@ const ProductPage = () => {
                   Upload {/* {uploading ? "Uploading..." : "Upload"} */}
                 </button>
               </div>
+              {message && (
+                <span className="text-sm text-info mt-2">{message}</span>
+              )}
             </div>
 
             {/* IMAGE PREVIEW */}
@@ -231,8 +253,14 @@ const ProductPage = () => {
                 className="btn btn-primary"
                 onClick={() => navigate("/")}
               >
-                <SaveIcon className="size-4 mr-2" />
-                Save Changes
+                {loading ? (
+                  <span className="loading loading-spinner loading-sm" />
+                ) : (
+                  <>
+                    <SaveIcon className="size-4 mr-2" />
+                    Save Changes
+                  </>
+                )}
               </button>
             </div>
           </form>

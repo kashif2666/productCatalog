@@ -5,14 +5,25 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
+import { Loader } from "lucide-react";
 function App() {
-  const { user, authCheck } = useAuthStore();
+  const { user, authCheck, isCheckingAuth } = useAuthStore();
 
   console.log("current user", user);
 
   useEffect(() => {
     authCheck();
   }, [authCheck]);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="h-screen">
+        <div className="flex justify-center items-center bg-black h-full">
+          <Loader className="animate-ping text-red-600 size-10" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-base-200 transition-colors duration-300">
