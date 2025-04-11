@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { Product } from "../types/product";
 import axios from "axios";
 import React from "react";
+import toast from "react-hot-toast";
 
 interface ProductStore {
   products: Product[];
@@ -78,6 +79,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       await get().fetchProducts();
       get().resetForm();
 
+      toast.success("Product added Successfully !");
+
       const modal = document.getElementById(
         "addProductModal"
       ) as HTMLDialogElement;
@@ -85,7 +88,8 @@ export const useProductStore = create<ProductStore>((set, get) => ({
         modal.close();
       }
     } catch (error) {
-      console.log("Error in fetch products", error);
+      console.log("Error in adding new Products products", error);
+      toast.error("Something went wrong");
     } finally {
       set({ loading: false });
     }
@@ -99,9 +103,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       const response = await axios.patch(`/api/products/${id}`, formData);
       console.log(response.data, "coming from backend");
       set({ formData: response.data.data, error: null });
+      toast.success("Product updated Successfully !");
     } catch (error) {
       console.log("Error in update products", error);
       set({ error: "Something went wrong" });
+      toast.error("Something went wrong");
     } finally {
       set({ loading: false });
     }
@@ -114,9 +120,11 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       set((prev) => ({
         products: prev.products.filter((product) => product.id !== id),
       }));
+      toast.success("Product deleted Successfully !");
     } catch (error) {
       console.log("Error in update products", error);
       set({ error: "Something went wrong" });
+      toast.error("Something went wrong");
     } finally {
       set({ loading: false });
     }

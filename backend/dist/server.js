@@ -24,7 +24,7 @@ app.use((0, cors_1.default)({
     origin: "http://localhost:5173",
     credentials: true,
 }));
-app.use("/uploads", express_1.default.static(path.join(__dirname, "./uploads")));
+app.use("/api/uploads", express_1.default.static(path.join(__dirname, "./uploads")));
 app.use("/api/upload", uploadRoutes_1.default);
 app.use("/api/v1/auth", authRoutes_1.default);
 app.use("/api/products", authMiddleware_1.protectRoute, productRoutes_1.default);

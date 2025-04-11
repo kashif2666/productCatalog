@@ -200,7 +200,7 @@ const ProductPage = () => {
             <div className="form-control">
               <label className="label">
                 <span className="label-text text-base font-medium my-1">
-                  Upload Image
+                  Change Image
                 </span>
               </label>
               <div className="flex items-center gap-4">

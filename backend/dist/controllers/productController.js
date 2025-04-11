@@ -77,9 +77,7 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.getProduct = getProduct;
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const { name, description, price, stock } = req.body;
-    const image = (_a = req.file) === null || _a === void 0 ? void 0 : _a.filename;
+    const { name, description, price, stock, image } = req.body;
     if (!name || !description || !price || !stock || !image) {
         res.status(400).json({
             status: 400,
@@ -106,12 +104,9 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.createProduct = createProduct;
 const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     const { id } = req.params;
-    const image = (_a = req.file) === null || _a === void 0 ? void 0 : _a.filename;
-    const productUpdates = Object.assign(Object.assign({}, req.body), { image });
     try {
-        const updatedProduct = yield productService.updateProduct(Number(id), productUpdates);
+        const updatedProduct = yield productService.updateProduct(Number(id), req.body);
         updatedProduct
             ? res
                 .status(200)

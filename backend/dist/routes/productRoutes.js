@@ -43,6 +43,6 @@ const router = express_1.default.Router();
 router.get("/", productController.getProducts);
 router.get("/:id", productController.getProduct);
 router.post("/", upload_1.default.single("image"), productController.createProduct);
-router.patch("/:id", upload_1.default.single("file"), productController.updateProduct);
+router.patch("/:id", upload_1.default.single("image"), productController.updateProduct);
 router.delete("/:id", productController.deleteProduct);
 exports.default = router;

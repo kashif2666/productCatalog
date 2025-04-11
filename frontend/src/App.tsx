@@ -6,6 +6,7 @@ import SignupPage from "./pages/SignupPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
+import { Toaster } from "react-hot-toast";
 function App() {
   const { user, authCheck, isCheckingAuth } = useAuthStore();
 
@@ -26,24 +27,28 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-base-200 transition-colors duration-300">
-      <Routes>
-        <Route
-          path="/"
-          element={!user ? <Navigate to={"/login"} /> : <HomePage />}
-        />
-        <Route
-          path="/login"
-          element={!user ? <LoginPage /> : <Navigate to={"/"} />}
-        />
-        <Route
-          path="/signup"
-          element={!user ? <SignupPage /> : <Navigate to={"/"} />}
-        />
+    <>
+      <div className="min-h-screen bg-base-200 transition-colors duration-300">
+        <Routes>
+          <Route
+            path="/"
+            element={!user ? <Navigate to={"/login"} /> : <HomePage />}
+          />
+          <Route
+            path="/login"
+            element={!user ? <LoginPage /> : <Navigate to={"/"} />}
+          />
+          <Route
+            path="/signup"
+            element={!user ? <SignupPage /> : <Navigate to={"/"} />}
+          />
 
-        <Route path="/product/:id" element={<ProductPage />} />
-      </Routes>
-    </div>
+          <Route path="/product/:id" element={<ProductPage />} />
+        </Routes>
+      </div>
+
+      <Toaster />
+    </>
   );
 }
 
