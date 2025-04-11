@@ -50,26 +50,32 @@ const authService = __importStar(require("../services/authService"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-        res.status(400).json({
-            status: 400,
-            success: false,
-            message: "All fields are required !",
-        });
+    const { username, email, password } = req.body;
+    if (!username || !email || !password) {
+        res
+            .status(400)
+            .json({ success: false, message: "All fields are required" });
+        return;
     }
     try {
-        yield authService.signup(name, email, password);
-        res.status(201).json({
-            status: 201,
-            success: true,
-            message: "User registered successfully !",
+        const result = yield authService.signup(username, email, password);
+        console.log(result);
+        if (!result) {
+            res.status(401).json({ success: false, message: "Signup failed" });
+            return;
+        }
+        // Set cookie
+        res.cookie("token", result === null || result === void 0 ? void 0 : result.token, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: false,
+            maxAge: 3600000, // 1 hour
         });
+        res.status(201).json({ success: true, user: result === null || result === void 0 ? void 0 : result.user });
     }
     catch (error) {
-        res
-            .status(500)
-            .json({ status: 500, success: true, message: "Internal Server Error" });
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+        return;
     }
 });
 exports.signup = signup;
@@ -81,19 +87,22 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             success: false,
             message: "All fields are required !",
         });
+        return;
     }
     try {
         const result = yield authService.login(email, password);
+        console.log(result);
         if (!result) {
             res
                 .status(401)
                 .json({ status: 401, success: false, message: "Invalid Credentials" });
+            return;
         }
         res.cookie("token", result === null || result === void 0 ? void 0 : result.token, {
             httpOnly: true,
             maxAge: 3600000,
-            sameSite: "strict",
-            secure: process.env.NODE_ENV !== "development",
+            sameSite: "lax",
+            secure: false,
         });
         res.status(200).json({ status: 200, success: true, user: result === null || result === void 0 ? void 0 : result.user });
     }

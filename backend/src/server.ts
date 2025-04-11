@@ -3,11 +3,13 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import productRoutes from "./routes/productRoutes";
 import authRoutes from "./routes/authRoutes";
+import uploadRoutes from "./routes/uploadRoutes";
 
 import { productDB } from "./config/productDB";
 import { userDB } from "./config/userDB";
 import cors from "cors";
 import { protectRoute } from "./middleware/authMiddleware";
+import path = require("path");
 
 dotenv.config();
 
@@ -24,6 +26,10 @@ app.use(
     credentials: true,
   })
 );
+
+
+app.use("/api/uploads", express.static(path.join(__dirname, "./uploads")));
+app.use("/api/upload", uploadRoutes);
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/products", protectRoute, productRoutes);

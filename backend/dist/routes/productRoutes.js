@@ -38,10 +38,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const productController = __importStar(require("../controllers/productController"));
+const upload_1 = __importDefault(require("../middleware/upload"));
 const router = express_1.default.Router();
 router.get("/", productController.getProducts);
 router.get("/:id", productController.getProduct);
-router.post("/", productController.createProduct);
-router.patch("/:id", productController.updateProduct);
+router.post("/", upload_1.default.single("image"), productController.createProduct);
+router.patch("/:id", upload_1.default.single("file"), productController.updateProduct);
 router.delete("/:id", productController.deleteProduct);
 exports.default = router;

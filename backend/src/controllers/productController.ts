@@ -41,8 +41,9 @@ export const createProduct = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { name, description, price, stock } = req.body;
-  if (!name || !description || !price || !stock) {
+  const { name, description, price, stock, image } = req.body;
+
+  if (!name || !description || !price || !stock || !image) {
     res.status(400).json({
       status: 400,
       success: false,
@@ -50,12 +51,14 @@ export const createProduct = async (
     });
     return;
   }
+
   try {
     const newProduct = await productService.createProduct({
       name,
       description,
       price,
       stock,
+      image,
     });
     res.status(201).json({ status: 201, success: true, data: newProduct });
   } catch (error) {
@@ -70,6 +73,7 @@ export const updateProduct = async (
   res: Response
 ): Promise<void> => {
   const { id } = req.params;
+
   try {
     const updatedProduct = await productService.updateProduct(
       Number(id),
@@ -98,7 +102,11 @@ export const deleteProduct = async (
   try {
     const deleted = await productService.deleteProduct(Number(id));
     deleted
-      ? res.status(200).json({ status: 200, success: true, message:"Product deleted successfully" })
+      ? res.status(200).json({
+          status: 200,
+          success: true,
+          message: "Product deleted successfully",
+        })
       : res
           .status(404)
           .json({ status: 404, success: false, message: "Product not found" });

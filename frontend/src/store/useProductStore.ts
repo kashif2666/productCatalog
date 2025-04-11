@@ -28,10 +28,19 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     description: "",
     price: 0.0,
     stock: 0,
+    image: "",
   },
   setFormData: (formData) => set({ formData }),
   resetForm: () =>
-    set({ formData: { name: "", description: "", price: 0.0, stock: 0 } }),
+    set({
+      formData: {
+        name: "",
+        description: "",
+        price: 0.0,
+        stock: 0,
+        image: "",
+      },
+    }),
 
   fetchProducts: async () => {
     set({ loading: true });
@@ -63,7 +72,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ loading: true });
     try {
       const { formData } = get();
-      await axios.post(`/api/products`, formData);
+      console.log(formData);
+      const response = await axios.post(`/api/products`, formData);
+      console.log(response.data, "going to backend");
       await get().fetchProducts();
       get().resetForm();
 
@@ -84,7 +95,9 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ loading: true });
     try {
       const { formData } = get();
+      console.log(formData, "sending to backend");
       const response = await axios.patch(`/api/products/${id}`, formData);
+      console.log(response.data, "coming from backend");
       set({ formData: response.data.data, error: null });
     } catch (error) {
       console.log("Error in update products", error);

@@ -7,6 +7,8 @@ type ProductCardProps = {
   product: Product;
 };
 
+
+
 const ProductCard = ({ product }: ProductCardProps) => {
   const navigate = useNavigate();
   const { deleteProduct } = useProductStore();
@@ -20,8 +22,16 @@ const ProductCard = ({ product }: ProductCardProps) => {
       navigate("/");
     }
   };
+
   return (
     <div className="card bg-slate-600 text-primary-content w-90">
+      <figure className="relative pt-[56.25%]">
+        <img
+          src={`/api/uploads/${product?.image}`}
+          alt={product?.name}
+          className="absolute top-0 left-0 w-full h-full object-cover"
+        />
+      </figure>
       <div className="card-body ">
         <h2 className="card-title">{product.name}</h2>
         <p>{product.description}</p>

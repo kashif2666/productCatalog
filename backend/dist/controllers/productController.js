@@ -77,8 +77,10 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.getProduct = getProduct;
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { name, description, price, stock } = req.body;
-    if (!name || !description || !price || !stock) {
+    const image = (_a = req.file) === null || _a === void 0 ? void 0 : _a.filename;
+    if (!name || !description || !price || !stock || !image) {
         res.status(400).json({
             status: 400,
             success: false,
@@ -92,6 +94,7 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             description,
             price,
             stock,
+            image,
         });
         res.status(201).json({ status: 201, success: true, data: newProduct });
     }
@@ -103,9 +106,12 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.createProduct = createProduct;
 const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { id } = req.params;
+    const image = (_a = req.file) === null || _a === void 0 ? void 0 : _a.filename;
+    const productUpdates = Object.assign(Object.assign({}, req.body), { image });
     try {
-        const updatedProduct = yield productService.updateProduct(Number(id), req.body);
+        const updatedProduct = yield productService.updateProduct(Number(id), productUpdates);
         updatedProduct
             ? res
                 .status(200)
@@ -127,7 +133,11 @@ const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const deleted = yield productService.deleteProduct(Number(id));
         deleted
-            ? res.status(200).json({ status: 200, success: true, message: "Product deleted successfully" })
+            ? res.status(200).json({
+                status: 200,
+                success: true,
+                message: "Product deleted successfully",
+            })
             : res
                 .status(404)
                 .json({ status: 404, success: false, message: "Product not found" });

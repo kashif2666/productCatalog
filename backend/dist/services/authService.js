@@ -18,13 +18,17 @@ const db_1 = __importDefault(require("../config/db"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const signup = (name, email, password) => __awaiter(void 0, void 0, void 0, function* () {
+const signup = (username, email, password) => __awaiter(void 0, void 0, void 0, function* () {
     const hashedPassword = yield bcrypt_1.default.hash(password, 10);
-    yield db_1.default.query(`INSERT INTO users (name,email,password) VALUES (?,?,?)`, [
-        name,
-        email,
-        hashedPassword,
-    ]);
+    yield db_1.default.query("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", [username, email, hashedPassword]);
+    // Fetch newly created user
+    const [rows] = yield db_1.default.query("SELECT * FROM users WHERE email = ?", [email]);
+    if (rows.length === 0)
+        return null;
+    const user = rows[0];
+    // Generate token
+    const token = jsonwebtoken_1.default.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    return { token, user };
 });
 exports.signup = signup;
 const login = (email, password) => __awaiter(void 0, void 0, void 0, function* () {

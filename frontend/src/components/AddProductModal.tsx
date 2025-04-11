@@ -1,9 +1,64 @@
 import { PlusCircleIcon } from "lucide-react";
 import { useProductStore } from "../store/useProductStore";
+import React, { ChangeEvent, useState } from "react";
+import axios from "axios";
 
 const AddProductModal = () => {
   const { formData, setFormData, addProduct, loading, error } =
     useProductStore();
+  const [file, setFile] = useState<File | null>(null);
+  file;
+  const [message, setMessage] = useState<string>("");
+  const [uploading, setUploading] = useState<boolean>(false);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+      setMessage("");
+
+      console.log(e.target.files);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      setMessage("Please upload a file!");
+      return;
+    }
+
+    const uploadData = new FormData();
+    uploadData.append("image", file);
+
+    try {
+      setUploading(true);
+      setMessage("Uploading...");
+
+      const res = await axios.post("/api/upload/", uploadData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress: (event) => {
+          const percent = Math.round((event.loaded * 100) / (event.total || 1));
+          setMessage(`Uploading....${percent} %`);
+        },
+      });
+
+      setFormData({ ...formData, image: res.data.filename });
+      setMessage("Image Uploaded");
+    } catch (error) {
+      console.error(error);
+      setMessage("Upload Failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  console.log(formData);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    addProduct(e);
+  };
 
   return (
     <dialog id="addProductModal" className="modal">
@@ -23,7 +78,7 @@ const AddProductModal = () => {
 
         {/* Form */}
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           {/* PRODUCT NAME */}
           <div className="form-control">
             <label className="label">
@@ -100,6 +155,36 @@ const AddProductModal = () => {
             />
           </div>
 
+          {/* Product image */}
+
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text text-base font-medium my-1">
+                Upload Image
+              </span>
+            </label>
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                className="file-input file-input-bordered w-full"
+                onChange={handleFileChange}
+                disabled={uploading}
+              />
+
+              <button
+                type="button"
+                className="btn btn-primary whitespace-nowrap"
+                onClick={handleUpload}
+                disabled={!file || uploading}
+              >
+                {uploading ? "Uploading..." : "Upload"}
+              </button>
+            </div>
+            {message && (
+              <span className="text-sm text-info mt-2">{message}</span>
+            )}
+          </div>
+
           {/* FORM ACTIONS */}
           <div className="modal-action flex justify-between mt-8">
             <button
@@ -119,7 +204,6 @@ const AddProductModal = () => {
             <button
               type="submit"
               className="btn btn-primary"
-              onClick={addProduct}
               disabled={
                 !formData.name ||
                 !formData.description ||

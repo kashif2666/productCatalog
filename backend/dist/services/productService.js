@@ -39,9 +39,9 @@ const getProductById = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getProductById = getProductById;
 const createProduct = (productData) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, description, price, stock } = productData;
+    const { name, description, price, stock, image } = productData;
     try {
-        const [result] = yield db_1.default.execute("INSERT INTO products (name, description, price, stock) VALUES (?,?,?,?)", [name, description, price, stock]);
+        const [result] = yield db_1.default.execute("INSERT INTO products (name, description, price, stock, image) VALUES (?,?,?,?,?)", [name, description, price, stock, image !== null && image !== void 0 ? image : null]);
         const insertedId = result.insertId;
         if (!insertedId) {
             throw new Error("Failed to retrive insertId");
@@ -56,14 +56,15 @@ const createProduct = (productData) => __awaiter(void 0, void 0, void 0, functio
 exports.createProduct = createProduct;
 const updateProduct = (id, productData) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { name = null, description = null, price = null, stock = null, } = productData;
+        const { name = null, description = null, price = null, stock = null, image = null, } = productData;
         const [result] = yield db_1.default.execute(`UPDATE products 
        SET 
          name = COALESCE(?, name), 
          description = COALESCE(?, description), 
          price = COALESCE(?, price), 
-         stock = COALESCE(?, stock) 
-       WHERE id = ?`, [name, description, price, stock, id]);
+         stock = COALESCE(?, stock),
+         image = COALESCE(?, image) 
+       WHERE id = ?`, [name, description, price, stock, image, id]);
         if (result.affectedRows === 0) {
             console.warn(`No product found with ID ${id}. Update skipped.`);
             return null;

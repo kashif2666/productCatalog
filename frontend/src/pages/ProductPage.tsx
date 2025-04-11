@@ -1,7 +1,8 @@
 import { SaveIcon, Trash2Icon } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useProductStore } from "../store/useProductStore";
-import { useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
+import axios from "axios";
 
 const ProductPage = () => {
   const navigate = useNavigate();
@@ -16,12 +17,55 @@ const ProductPage = () => {
     loading,
     error,
   } = useProductStore();
+  const [file, setFile] = useState<File | null>(null);
+  file;
+  const [message, setMessage] = useState<string>("");
+  const [uploading, setUploading] = useState<boolean>(false);
 
   useEffect(() => {
     if (id) {
       fetchProduct(Number(id));
     }
   }, [fetchProduct, id]);
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
+      setMessage("");
+
+      console.log(e.target.files);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!file) {
+      setMessage("Please upload a file!");
+      return;
+    }
+
+    const uploadData = new FormData();
+    uploadData.append("image", file);
+
+    try {
+      setUploading(true);
+      setMessage("Uploading...");
+
+      const res = await axios.post("/api/upload/", uploadData, {
+        onUploadProgress: (event) => {
+          const percent = Math.round((event.loaded * 100) / (event.total || 1));
+          setMessage(`Uploading....${percent} %`);
+        },
+      });
+
+      setFormData({ ...formData, image: res.data.filename });
+      setMessage("Image Uploaded");
+    } catch (error) {
+      console.error(error);
+      setMessage("Upload Failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (
@@ -32,6 +76,8 @@ const ProductPage = () => {
       navigate("/");
     }
   };
+
+  console.log(formData, "FormData");
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl justify-items-center">
       <button
@@ -129,6 +175,45 @@ const ProductPage = () => {
                 }
               />
             </div>
+
+            {/* Product image */}
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text text-base font-medium my-1">
+                  Upload Image
+                </span>
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="file"
+                  className="file-input file-input-bordered w-full"
+                  onChange={handleFileChange}
+                  disabled={uploading}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn-primary whitespace-nowrap"
+                  onClick={handleUpload}
+                  disabled={!file || uploading}
+                >
+                  Upload {/* {uploading ? "Uploading..." : "Upload"} */}
+                </button>
+              </div>
+            </div>
+
+            {/* IMAGE PREVIEW */}
+            {formData.image && (
+              <div className="mt-4">
+                <p className="text-sm font-medium mb-1">Current Image:</p>
+                <img
+                  src={`/api/uploads/${formData.image}`} // adjust path if needed
+                  alt="Product"
+                  className="h-32 object-cover rounded border"
+                />
+              </div>
+            )}
 
             {/* FORM ACTIONS */}
             <div className="flex justify-between mt-8">
