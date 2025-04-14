@@ -7,6 +7,7 @@ import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
+import PageNotFound from "./pages/PageNotFound";
 function App() {
   const { user, authCheck, isCheckingAuth } = useAuthStore();
 
@@ -44,6 +45,8 @@ function App() {
           />
 
           <Route path="/product/:id" element={<ProductPage />} />
+
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </div>
 

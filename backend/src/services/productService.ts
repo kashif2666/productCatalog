@@ -5,15 +5,30 @@ import { Product } from "../models/productModel";
 type ProductRow = Product & RowDataPacket;
 
 // Fetch all products
-export const getProducts = async (): Promise<Product[]> => {
+export const getProducts = async (
+  limit: number,
+  offset: number
+): Promise<Product[]> => {
   try {
     const [rows] = await pool.query<ProductRow[]>(
-      "SELECT * FROM products ORDER BY created_at DESC"
+      "SELECT * FROM products ORDER BY created_at DESC LIMIT ? OFFSET ?",
+      [limit, offset]
     );
     return rows;
   } catch (error) {
     console.error("Error fetching products:", error);
     return [];
+  }
+};
+
+// Fetch all products
+export const getTotalProducts = async (): Promise<number> => {
+  try {
+    const [rows] = await pool.query("SELECT COUNT(*) as count FROM products");
+    return (rows as any)[0].count;
+  } catch (error) {
+    console.error("Error count products:", error);
+    return 0;
   }
 };
 

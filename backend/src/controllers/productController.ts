@@ -5,9 +5,23 @@ export const getProducts = async (
   res: Response
 ): Promise<void> => {
   try {
-    const products = await productService.getProducts();
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
+    const offset = (page - 1) * limit;
 
-    res.status(200).json({ status: 200, success: true, data: products });
+    const products = await productService.getProducts(limit, offset);
+    const total = await productService.getTotalProducts();
+    const totalPages = Math.ceil(total / limit);
+
+    res.status(200).json({
+      status: 200,
+      success: true,
+      page,
+      limit,
+      totalProducts: total,
+      totalPages,
+      data: products,
+    });
     return;
   } catch (error) {
     console.log(error);

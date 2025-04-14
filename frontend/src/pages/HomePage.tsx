@@ -1,17 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import { useProductStore } from "../store/useProductStore";
 import AddProductModal from "../components/AddProductModal";
 import { useAuthStore } from "../store/useAuthStore";
 import { Loader, PackageIcon } from "lucide-react";
+import Pagination from "../components/Pagination";
 
 const HomePage = () => {
-  const { products, loading, error, resetForm, fetchProducts } =
-    useProductStore();
+  const {
+    products,
+    loading,
+    error,
+    totalPages,
+    totalProducts,
+    resetForm,
+    fetchProducts,
+  } = useProductStore();
   const { logout } = useAuthStore();
+
+  const [page, setPage] = useState<number>(1);
+  const limit: number = 6;
+
   useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+    fetchProducts(page, limit);
+  }, [page, limit]);
 
   const openAddProductModal = () => {
     const modal = document.getElementById(
@@ -57,11 +69,24 @@ const HomePage = () => {
           <Loader className="animate-ping text-red-600 size-10" />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-10">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalProducts={totalProducts}
+                onPageChange={(newPage) => setPage(newPage)}
+              />
+            </div>
+          )}
+        </>
       )}
     </main>
   );

@@ -6,6 +6,9 @@ import toast from "react-hot-toast";
 
 interface ProductStore {
   products: Product[];
+  page: number;
+  totalPages: number;
+  totalProducts: number | null;
   loading: boolean;
   error: string | null;
 
@@ -13,7 +16,7 @@ interface ProductStore {
   setFormData: (formData: ProductStore["formData"]) => void;
   resetForm: () => void;
 
-  fetchProducts: () => Promise<void>;
+  fetchProducts: (currentPage: number, limit: number) => Promise<void>;
   fetchProduct: (id: number) => Promise<void>;
   addProduct: (e: React.FormEvent) => Promise<void>;
   updateProduct: (id: number) => Promise<void>;
@@ -22,6 +25,9 @@ interface ProductStore {
 
 export const useProductStore = create<ProductStore>((set, get) => ({
   products: [],
+  page: 1,
+  totalPages: 1,
+  totalProducts: null,
   loading: false,
   error: null,
   formData: {
@@ -43,11 +49,19 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       },
     }),
 
-  fetchProducts: async () => {
+  fetchProducts: async (currentPage, limit) => {
     set({ loading: true });
     try {
-      const response = await axios.get(`/api/products`);
-      set({ products: response.data.data, error: null });
+      const response = await axios.get(
+        `/api/products?page=${currentPage}&limit=${limit}`
+      );
+      set({
+        products: response.data.data,
+        page: response.data.page,
+        totalPages: response.data.totalPages,
+        totalProducts: response.data.totalProducts,
+        error: null,
+      });
     } catch (error) {
       console.log("Error in fetch products", error);
     } finally {
@@ -76,7 +90,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       console.log(formData);
       const response = await axios.post(`/api/products`, formData);
       console.log(response.data, "going to backend");
-      await get().fetchProducts();
+      await get().fetchProducts(1, 6);
       get().resetForm();
 
       toast.success("Product added Successfully !");
